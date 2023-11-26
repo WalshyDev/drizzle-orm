@@ -8,7 +8,6 @@ import { type BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import {
 	SQLiteAsyncDialect,
-	SQLiteDialect,
 	alias,
 	blob,
 	getTableConfig,
@@ -2071,6 +2070,7 @@ test.serial('text w/ json mode', (t) => {
 test.serial('test collate', (t) => {
 	const { db } = t.context;
 
+	// Validate the query has COLLATE NOCASEs
 	const dialect = new SQLiteAsyncDialect();
 	t.is(dialect.sqlToQuery(collateExample.getSQL()).sql, 'CREATE TABLE `collate_example` ()');
 
