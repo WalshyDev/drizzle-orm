@@ -27,7 +27,7 @@ const ENABLE_LOGGING = false;
 
 const usersTable = sqliteTable('users', {
 	id: integer('id').primaryKey(),
-	name: text('name').notNull().collate('NOCASE'),
+	name: text('name').notNull(),
 	verified: integer('verified', { mode: 'boolean' }).notNull().default(false),
 	json: blob('json', { mode: 'json' }).$type<string[]>(),
 	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`strftime('%s', 'now')`),
@@ -87,6 +87,11 @@ const bigIntExample = sqliteTable('big_int_example', {
 	id: integer('id').primaryKey(),
 	name: text('name').notNull(),
 	bigInt: blob('big_int', { mode: 'bigint' }).notNull(),
+});
+
+const collateExample = sqliteTable('collate_example', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+	name: text('name').notNull().collate('NOCASE'),
 });
 
 interface Context {
@@ -2064,10 +2069,21 @@ test.serial('text w/ json mode', (t) => {
 test.serial('test collate', (t) => {
 	const { db } = t.context;
 
-	db.insert(usersTable).values({ name: 'John Doe' }).run();
+	t.is(collateExample.getSQL(), 'CREATE TABLE `collate_example` ()');
 
+	// Create the table
+	db.run(sql`drop table if exists ${collateExample}`);
+	db.run(collateExample.getSQL());
+
+	// Insert
+	db.insert(collateExample).values({ name: 'John Doe' }).run();
+
+	// Validate no case will ignore casing
 	const result = db.get<{ id: number; name: string }>(
-		sql`select ${usersTable.name} from ${usersTable} where ${usersTable.name} = 'john doe'`,
+		sql`select ${collateExample.name} from ${collateExample} where ${collateExample.name} = 'john doe'`,
 	);
 	t.deepEqual(result, { name: 'John Doe' });
+
+	// Cleanup
+	db.run(sql`drop table ${collateExample}`);
 });
