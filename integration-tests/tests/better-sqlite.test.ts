@@ -2041,7 +2041,7 @@ test.serial('select + .get() for empty result', (t) => {
 	db.run(sql`drop table ${users}`);
 });
 
-test.serial.only('text w/ json mode', (t) => {
+test.serial('text w/ json mode', (t) => {
 	const { db } = t.context;
 
 	const test = sqliteTable('test', {
@@ -2060,3 +2060,5 @@ test.serial.only('text w/ json mode', (t) => {
 
 	db.run(sql`drop table ${test}`);
 });
+
+test.serial('')
