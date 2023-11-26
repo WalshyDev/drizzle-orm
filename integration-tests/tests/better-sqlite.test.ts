@@ -7,6 +7,8 @@ import { asc, eq, type Equal, gt, inArray, name, placeholder, sql, TransactionRo
 import { type BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import {
+	SQLiteAsyncDialect,
+	SQLiteDialect,
 	alias,
 	blob,
 	getTableConfig,
@@ -2069,7 +2071,8 @@ test.serial('text w/ json mode', (t) => {
 test.serial('test collate', (t) => {
 	const { db } = t.context;
 
-	t.is(collateExample.getSQL(), 'CREATE TABLE `collate_example` ()');
+	const dialect = new SQLiteAsyncDialect();
+	t.is(dialect.sqlToQuery(collateExample.getSQL()).sql, 'CREATE TABLE `collate_example` ()');
 
 	// Create the table
 	db.run(sql`drop table if exists ${collateExample}`);
