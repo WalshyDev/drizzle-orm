@@ -2066,8 +2066,8 @@ test.serial('test collate', (t) => {
 
 	db.insert(usersTable).values({ name: 'John Doe' }).run();
 
-	const result = db.select().from(usersTable).where(sql`${usersTable.name} = 'john doe'`).get();
-	console.log(result);
-
+	const result = db.get<{ id: number; name: string }>(
+		sql`select ${usersTable.name} from ${usersTable} where ${usersTable.name} = 'john doe'`,
+	);
 	t.deepEqual(result, { name: 'John Doe' });
 });
