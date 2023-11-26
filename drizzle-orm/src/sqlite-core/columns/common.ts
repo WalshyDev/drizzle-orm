@@ -57,6 +57,11 @@ export abstract class SQLiteColumnBuilder<
 		return this;
 	}
 
+	collate(sequence: 'BINARY' | 'NOCASE' | 'RTRIM') {
+		this.config.dataType += ` COLLATE ${sequence}`;
+		return this;
+	}
+
 	/** @internal */
 	buildForeignKeys(column: SQLiteColumn, table: SQLiteTable): ForeignKey[] {
 		return this.foreignKeyConfigs.map(({ ref, actions }) => {

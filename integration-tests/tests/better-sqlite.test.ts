@@ -71,7 +71,7 @@ const usersMigratorTable = sqliteTable('users12', {
 
 const anotherUsersMigratorTable = sqliteTable('another_users', {
 	id: integer('id').primaryKey(),
-	name: text('name').notNull(),
+	name: text('name').notNull().collate('NOCASE'),
 	email: text('email').notNull(),
 });
 

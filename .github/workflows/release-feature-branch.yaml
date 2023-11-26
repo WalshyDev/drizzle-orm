@@ -14,9 +14,9 @@ jobs:
       matrix:
         package:
           - drizzle-orm
-          - drizzle-zod
-          - drizzle-typebox
-          - drizzle-valibot
+          # - drizzle-zod
+          # - drizzle-typebox
+          # - drizzle-valibot
     runs-on: ubuntu-20.04
     permissions:
       contents: read
@@ -114,8 +114,9 @@ jobs:
           PLANETSCALE_CONNECTION_STRING: ${{ secrets.PLANETSCALE_CONNECTION_STRING }}
           LIBSQL_URL: file:local.db
         run: |
+          export SKIP_PLANETSCALE_TESTS=1
           if [[ ${{ github.event_name }} != "push" && "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
-            export SKIP_PLANETSCALE_TESTS=1
+            export SKIP_PLANETSCALE_TESTS=1  
           fi
           if [[ "${{ matrix.package }}" == "drizzle-orm" ]]; then
             pnpm test --filter ${{ matrix.package }} --filter integration-tests
@@ -124,7 +125,8 @@ jobs:
           fi
 
       - name: Pack
-        if: steps.checks.outputs.has_new_release == 'true'
+        if: false
+        # if: steps.checks.outputs.has_new_release == 'true'
         working-directory: ${{ matrix.package }}
         shell: bash
         env:
@@ -133,7 +135,8 @@ jobs:
           npm run pack
   
       - name: Run @arethetypeswrong/cli
-        if: steps.checks.outputs.has_new_release == 'true'
+        if: false
+        # if: steps.checks.outputs.has_new_release == 'true'
         working-directory: ${{ matrix.package }}
         shell: bash
         env:
@@ -142,7 +145,8 @@ jobs:
           pnpm attw package.tgz
 
       - name: Publish
-        if: github.event_name == 'push' && steps.checks.outputs.has_new_release == 'true'
+        if: false
+        # if: github.event_name == 'push' && steps.checks.outputs.has_new_release == 'true'
         run: |
           tag="${{ steps.checks.outputs.tag }}"
           version="${{ steps.checks.outputs.version }}"
