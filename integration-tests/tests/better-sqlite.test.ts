@@ -27,7 +27,7 @@ const ENABLE_LOGGING = false;
 
 const usersTable = sqliteTable('users', {
 	id: integer('id').primaryKey(),
-	name: text('name').notNull(),
+	name: text('name').notNull().collate('NOCASE'),
 	verified: integer('verified', { mode: 'boolean' }).notNull().default(false),
 	json: blob('json', { mode: 'json' }).$type<string[]>(),
 	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`strftime('%s', 'now')`),
@@ -71,7 +71,7 @@ const usersMigratorTable = sqliteTable('users12', {
 
 const anotherUsersMigratorTable = sqliteTable('another_users', {
 	id: integer('id').primaryKey(),
-	name: text('name').notNull().collate('NOCASE'),
+	name: text('name').notNull(),
 	email: text('email').notNull(),
 });
 
@@ -2061,4 +2061,13 @@ test.serial('text w/ json mode', (t) => {
 	db.run(sql`drop table ${test}`);
 });
 
-test.serial('')
+test.serial('test collate', (t) => {
+	const { db } = t.context;
+
+	db.insert(usersTable).values({ name: 'John Doe' }).run();
+
+	const result = db.select().from(usersTable).where(sql`${usersTable.name} = 'john doe'`).get();
+	console.log(result);
+
+	t.deepEqual(result, { name: 'John Doe' });
+});
